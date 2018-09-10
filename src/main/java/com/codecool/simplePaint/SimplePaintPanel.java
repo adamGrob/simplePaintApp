@@ -45,7 +45,9 @@ public class SimplePaintPanel extends JPanel
 
     private boolean moving;  // This is set true while the use is moving the cursor
 
-    private boolean straightLine = false;
+    private boolean straightLine = true;
+
+    private boolean snapping = true;
 
     private Graphics graphicsForDrawing;  // A graphics context for the panel
     // that is used to draw the user's curve.
@@ -56,10 +58,11 @@ public class SimplePaintPanel extends JPanel
      * white and sets it to listen for mouse events on itself.
      */
     SimplePaintPanel() {
-        setBackground(new Color(0, 0, 0, 0));
         addMouseListener(this);
         addMouseMotionListener(this);
         addComponentListener(this);
+        this.setOpaque(false);
+        setBackground(Color.WHITE);
     }
 
 
@@ -207,9 +210,6 @@ public class SimplePaintPanel extends JPanel
 
         int x = evt.getX();   // x-coordinate where the user clicked.
         int y = evt.getY();   // y-coordinate where the user clicked.
-
-
-
         int width = getWidth();    // Width of the panel.
         int height = getHeight();  // Height of the panel.
 
@@ -250,9 +250,25 @@ public class SimplePaintPanel extends JPanel
     public void mouseReleased(MouseEvent evt) {
 
         if (straightLine) {
-            graphicsForDrawing.drawLine(startX, startY, endX, endY);
-            lineList.add(new Line(new Position(startX, startY, getWidth()-57, getHeight()),
-                    new Position(endX, endY, getWidth() - 57, getHeight())));
+            Position startPositionToSnap = new Position(startX, startY,getWidth()-57, getHeight());
+            Position endPositionToSnap = new Position(endX, endY,getWidth()-57, getHeight());
+            if(snapping) {
+                Position snappedStartPosition = linePositionController.PositionSnapper(startPositionToSnap, lineList, 25);
+                Position snappedEndPosition =  linePositionController.PositionSnapper(endPositionToSnap, lineList, 25);
+                graphicsForDrawing.drawLine(snappedStartPosition.x, snappedStartPosition.y, snappedEndPosition.x, snappedEndPosition.y);
+                lineList.add(new Line(snappedStartPosition, snappedEndPosition));
+            } else {
+                graphicsForDrawing.drawLine(startPositionToSnap.x, startPositionToSnap.y, endPositionToSnap.x, endPositionToSnap.y);
+                lineList.add(new Line(startPositionToSnap, endPositionToSnap));
+            }
+            drawLines();
+            graphicsForDrawing.setColor(Color.white);
+            graphicsForDrawing.fillRect(0,0,getWidth() - 55,getHeight());
+            setUpDrawingGraphics();
+            ((Graphics2D) graphicsForDrawing).setStroke(new BasicStroke(10, BasicStroke.CAP_ROUND,    // End-cap style
+                    BasicStroke.JOIN_ROUND));
+           // lineList.add(new Line(snappedStartPosition, snappedEndPosition));
+            drawLines();
         } else {
             if (dragging == false)
                 return;  // Nothing to do because the user isn't drawing.
@@ -292,7 +308,7 @@ public class SimplePaintPanel extends JPanel
 
 
         if (straightLine && dragging && moving) {
-            graphicsForDrawing.setColor(Color.white);
+            graphicsForDrawing.setColor(Color.WHITE);
             graphicsForDrawing.fillRect(0,0,getWidth() - 55,getHeight());
             setUpDrawingGraphics();
             ((Graphics2D) graphicsForDrawing).setStroke(new BasicStroke(10, BasicStroke.CAP_ROUND,    // End-cap style
@@ -300,7 +316,13 @@ public class SimplePaintPanel extends JPanel
             endX = x;
             endY = y;
             drawLines();
-            graphicsForDrawing.drawLine(startX, startY, x, y);  // Draw the line.
+            Position startingPositionToSnap = new Position(startX, startY, getWidth() - 55,getHeight());
+            Position snappedStarringPosition = linePositionController.PositionSnapper(startingPositionToSnap,lineList ,25);
+            if (snapping) {
+                graphicsForDrawing.drawLine(snappedStarringPosition.x, snappedStarringPosition.y, x, y);  // Draw the line.
+            } else {
+                graphicsForDrawing.drawLine(startX, startY, x, y);  // Draw the line.
+            }
             System.out.println(startX + " " +  startY + " "  + x +  " " + y);
         } else if (!straightLine) {
             ((Graphics2D) graphicsForDrawing).setStroke(new BasicStroke(10, BasicStroke.CAP_ROUND,    // End-cap style
@@ -333,6 +355,8 @@ public class SimplePaintPanel extends JPanel
         }
 
     }
+
+
 
 
     public void mouseEntered(MouseEvent evt) { }   // Some empty routines.
