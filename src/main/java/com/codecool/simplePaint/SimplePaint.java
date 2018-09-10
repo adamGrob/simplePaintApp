@@ -1,9 +1,6 @@
 package com.codecool.simplePaint;
-
-
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
 
 
 /**
@@ -39,6 +36,7 @@ public class SimplePaint extends JApplet {
         window.setLocation(100,100);
         window.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
         window.setVisible(true);
+
 
     }
 
