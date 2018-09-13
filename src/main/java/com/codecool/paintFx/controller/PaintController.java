@@ -1,6 +1,7 @@
 package com.codecool.paintFx.controller;
 import com.codecool.paintFx.model.CustomLine;
 import com.codecool.paintFx.model.MyShape;
+import com.codecool.paintFx.model.Position;
 import com.codecool.paintFx.model.StraightLine;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
@@ -46,6 +47,9 @@ public class PaintController {
     @FXML
     private Button undo;
 
+    @FXML
+    private CheckBox lineSnapper;
+
     private CustomLine customLine;
 
     private List<StraightLine> straightLineList;
@@ -86,6 +90,12 @@ public class PaintController {
                 graphicsContext.setStroke(colorPicker.getValue());
                 graphicsContext.setLineWidth(size);
                 graphicsContext.setLineCap(StrokeLineCap.ROUND);
+                if(lineSnapper.isSelected()) {
+                    LinePositionController linePositionController = new LinePositionController();
+                    Position position = linePositionController.PositionSnapper(endX, endY, drawnShapeList, 30);
+                    endX = position.x;
+                    endY = position.y;
+                }
                 graphicsContext.strokeLine(startX, startY, endX, endY);
                 drawnShapeList.add(new StraightLine(startX, startY, endX, endY,colorPicker.getValue(), size));
             } else {
@@ -113,7 +123,6 @@ public class PaintController {
         // we offset mouseposition by half of the size
         double currX = mouseEvent.getX() - size / 2;
         double currY = mouseEvent.getY() - size / 2;
-
         Paint color = colorPicker.getValue();
         graphicsContext.setStroke(color);
         graphicsContext.setLineWidth(size);
@@ -128,9 +137,16 @@ public class PaintController {
         double size = Double.parseDouble(brushSize.getText());
         double currX = mouseEvent.getX() - size / 2;
         double currY = mouseEvent.getY() - size / 2;
-
+        if(lineSnapper.isSelected()) {
+            LinePositionController linePositionController = new LinePositionController();
+            Position startPosition  = linePositionController.PositionSnapper(startX, startY, drawnShapeList, 30);
+            Position endPosition = linePositionController.PositionSnapper(currX, currY, drawnShapeList, 30);
+            startX = startPosition.x;
+            startY = startPosition.y;
+            currX = endPosition.x;
+            currY = endPosition.y;
+        }
         redraw(drawnShapeList, graphicsContext);
-
         graphicsContext.setStroke(colorPicker.getValue());
         graphicsContext.setLineWidth(size);
         graphicsContext.setLineCap(StrokeLineCap.ROUND);
