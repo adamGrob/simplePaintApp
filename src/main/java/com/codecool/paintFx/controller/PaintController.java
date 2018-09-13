@@ -1,5 +1,4 @@
 package com.codecool.paintFx.controller;
-
 import com.codecool.paintFx.model.CustomLine;
 import com.codecool.paintFx.model.MyShape;
 import com.codecool.paintFx.model.StraightLine;
@@ -8,6 +7,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.TextField;
@@ -15,7 +15,6 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.StrokeLineCap;
-
 import javax.imageio.ImageIO;
 
 import java.io.File;
@@ -42,22 +41,21 @@ public class PaintController {
     private TextField brushSize;
 
     @FXML
-    private CheckBox eraser;
+    private CheckBox straightLineChecked;
 
     @FXML
-    private CheckBox straightLine;
+    private Button undo;
 
     private CustomLine customLine;
 
     private List<StraightLine> straightLineList;
 
     public void initialize() {
-
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
 
         canvas.setOnMouseDragged(mouseEvent -> {
 
-            if (straightLine.isSelected()) {
+            if (straightLineChecked.isSelected()) {
                 drawStraightLines(graphicsContext, mouseEvent);
             } else {
                 drawSimpleArcs(graphicsContext, mouseEvent);
@@ -71,13 +69,18 @@ public class PaintController {
             prevY = e.getY() - size / 2;
             startX = e.getX() - size / 2;
             startY = e.getY() - size / 2;
+        });
 
-
+        undo.setOnAction(e->{
+            if(drawnShapeList.size() != 0) {
+                drawnShapeList.remove(drawnShapeList.get(drawnShapeList.size()-1));
+                redraw(drawnShapeList, graphicsContext);
+            }
         });
 
         canvas.setOnMouseReleased(mouseReleaseEvent -> {
             double size = Double.parseDouble(brushSize.getText());
-            if (straightLine.isSelected()) {
+            if (straightLineChecked.isSelected()) {
                 endX = mouseReleaseEvent.getX()- size / 2;
                 endY = mouseReleaseEvent.getY()- size / 2;
                 graphicsContext.setStroke(colorPicker.getValue());
@@ -89,14 +92,12 @@ public class PaintController {
                 customLine = new CustomLine(straightLineList);
                 drawnShapeList.add(customLine);
             }
-
         });
     }
 
     public void onSave() {
         try {
             Image snapshot = canvas.snapshot(null, null);
-
             ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", new File("paint.png"));
         } catch (Exception e) {
             System.out.println("Failed to save image!");
@@ -112,27 +113,21 @@ public class PaintController {
         // we offset mouseposition by half of the size
         double currX = mouseEvent.getX() - size / 2;
         double currY = mouseEvent.getY() - size / 2;
-        if (eraser.isSelected()) {
-            graphicsContext.clearRect(currX, currY, size, size);
-        } else  {
-            Paint color = colorPicker.getValue();
-            graphicsContext.setStroke(color);
-            graphicsContext.setLineWidth(size);
-            graphicsContext.setLineCap(StrokeLineCap.ROUND);
-            graphicsContext.strokeLine(prevX, prevY, currX, currY);
-            straightLineList.add(new StraightLine(prevX, prevY, currX, currY,color, size));
-            prevX = currX;
-            prevY = currY;
-        }
+
+        Paint color = colorPicker.getValue();
+        graphicsContext.setStroke(color);
+        graphicsContext.setLineWidth(size);
+        graphicsContext.setLineCap(StrokeLineCap.ROUND);
+        graphicsContext.strokeLine(prevX, prevY, currX, currY);
+        straightLineList.add(new StraightLine(prevX, prevY, currX, currY,color, size));
+        prevX = currX;
+        prevY = currY;
     }
 
     private void drawStraightLines(GraphicsContext graphicsContext, MouseEvent mouseEvent) {
-
         double size = Double.parseDouble(brushSize.getText());
         double currX = mouseEvent.getX() - size / 2;
         double currY = mouseEvent.getY() - size / 2;
-
-        graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         redraw(drawnShapeList, graphicsContext);
 
@@ -144,6 +139,7 @@ public class PaintController {
     }
 
     private void redraw(List<MyShape> drawnShapeList, GraphicsContext graphicsContext) {
+        graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         for (MyShape myShape : drawnShapeList) {
             if (myShape.getClass() == StraightLine.class) {
                 StraightLine currStraightLine = (StraightLine)myShape;
