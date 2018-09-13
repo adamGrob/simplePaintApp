@@ -1,17 +1,17 @@
-package com.codecool.paintFx;
+package com.codecool.paintFx.model;
 
 import com.codecool.simplePaint.model.Position;
 import javafx.scene.paint.Paint;
 
 
-public class CustomLine {
+public class StraightLine extends MyShape {
 
     private double startX, startY;
     private double endX, endY;
     private Paint color;
     private double size;
 
-    public CustomLine(double startX, double startY, double endX, double endY, Paint color, double size) {
+    public StraightLine(double startX, double startY, double endX, double endY, Paint color, double size) {
         this.startX = startX;
         this.startY = startY;
         this.endX = endX;
