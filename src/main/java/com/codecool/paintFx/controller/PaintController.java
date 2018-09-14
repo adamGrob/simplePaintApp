@@ -130,8 +130,6 @@ public class PaintController {
         double currX = mouseEvent.getX() - size / 2;
         double currY = mouseEvent.getY() - size / 2;
         setupBrush(graphicsContext, size, colorPicker.getValue());
-        System.out.println(colorPicker.getValue());
-        System.out.println(size);
         if (shapeEnum.equals(ShapeEnum.CUSTOMLINE)) {
             graphicsContext.strokeLine(prevX, prevY, currX, currY);
             straightLineList.add(new StraightLine(prevX, prevY, currX, currY, colorPicker.getValue(), size));
