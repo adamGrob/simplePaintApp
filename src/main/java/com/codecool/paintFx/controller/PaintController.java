@@ -61,13 +61,13 @@ public class PaintController {
 
         canvas.setOnMouseDragged(mouseEvent -> {
             if (straightLineChecked.isSelected()) {
-                drawStraightLines(graphicsContext, mouseEvent);
+                drawShape(graphicsContext, mouseEvent, ShapeEnum.STRAIGHTLINE);
             } else if (square.isSelected()) {
-                drawRectangle(graphicsContext, mouseEvent);
+                drawShape(graphicsContext, mouseEvent, ShapeEnum.RECTANGLE);
             } else if (circle.isSelected()) {
-              drawOval(graphicsContext, mouseEvent);
+                drawShape(graphicsContext, mouseEvent, ShapeEnum.OVAL);
             } else {
-                drawSimpleArcs(graphicsContext, mouseEvent);
+                drawShape(graphicsContext, mouseEvent, ShapeEnum.CUSTOMLINE);
             }
         });
 
@@ -125,78 +125,46 @@ public class PaintController {
         Platform.exit();
     }
 
-    private void drawSimpleArcs(GraphicsContext graphicsContext, MouseEvent mouseEvent) {
+    private void drawShape(GraphicsContext graphicsContext, MouseEvent mouseEvent, ShapeEnum shapeEnum) {
         double size = Double.parseDouble(brushSize.getText());
         double currX = mouseEvent.getX() - size / 2;
         double currY = mouseEvent.getY() - size / 2;
-        setupBrush(graphicsContext, size,  colorPicker.getValue());
-        graphicsContext.strokeLine(prevX, prevY, currX, currY);
-        straightLineList.add(new StraightLine(prevX, prevY, currX, currY, colorPicker.getValue(), size));
-        prevX = currX;
-        prevY = currY;
-    }
-
-    private void drawStraightLines(GraphicsContext graphicsContext, MouseEvent mouseEvent) {
-        double size = Double.parseDouble(brushSize.getText());
-        double currX = mouseEvent.getX() - size / 2;
-        double currY = mouseEvent.getY() - size / 2;
-        if(lineSnapper.isSelected()) {
-            LinePositionController linePositionController = new LinePositionController();
-            Position startPosition  = linePositionController.PositionSnapper(startX, startY, drawnShapeList, rangeToSnap);
-            Position endPosition = linePositionController.PositionSnapper(currX, currY, drawnShapeList, rangeToSnap);
-            startX = startPosition.x;
-            startY = startPosition.y;
-            currX = endPosition.x;
-            currY = endPosition.y;
+        setupBrush(graphicsContext, size, colorPicker.getValue());
+        System.out.println(colorPicker.getValue());
+        System.out.println(size);
+        if (shapeEnum.equals(ShapeEnum.CUSTOMLINE)) {
+            graphicsContext.strokeLine(prevX, prevY, currX, currY);
+            straightLineList.add(new StraightLine(prevX, prevY, currX, currY, colorPicker.getValue(), size));
+            prevX = currX;
+            prevY = currY;
+        } else if (shapeEnum.equals(ShapeEnum.STRAIGHTLINE)) {
+            if(lineSnapper.isSelected()) {
+                LinePositionController linePositionController = new LinePositionController();
+                Position startPosition  = linePositionController.PositionSnapper(startX, startY, drawnShapeList, rangeToSnap);
+                Position endPosition = linePositionController.PositionSnapper(currX, currY, drawnShapeList, rangeToSnap);
+                startX = startPosition.x;
+                startY = startPosition.y;
+                currX = endPosition.x;
+                currY = endPosition.y;
+            }
+            redraw(drawnShapeList, graphicsContext);
+            graphicsContext.strokeLine(startX, startY, currX, currY);
+        } else if (shapeEnum.equals(ShapeEnum.RECTANGLE)) {
+            redraw(drawnShapeList, graphicsContext);
+            graphicsContext.strokeRect(startX, startY, Math.abs(currX - startX), Math.abs(currY - startY));
+        } else if (shapeEnum.equals(ShapeEnum.OVAL)) {
+            redraw(drawnShapeList, graphicsContext);
+            graphicsContext.strokeOval(startX, startY, Math.abs(currX - startX), Math.abs(currY - startY));
         }
-        redraw(drawnShapeList, graphicsContext);
-        setupBrush(graphicsContext, size, colorPicker.getValue());
-        graphicsContext.strokeLine(startX, startY, currX, currY);
-    }
-
-    private void drawRectangle(GraphicsContext graphicsContext, MouseEvent mouseEvent) {
-        double size = Double.parseDouble(brushSize.getText());
-        double currX = mouseEvent.getX() - size / 2;
-        double currY = mouseEvent.getY() - size / 2;
-        redraw(drawnShapeList, graphicsContext);
-        setupBrush(graphicsContext, size, colorPicker.getValue());
-        graphicsContext.strokeRect(startX, startY, Math.abs(currX - startX), Math.abs(currY - startY));
-    }
-
-    private void drawOval(GraphicsContext graphicsContext, MouseEvent mouseEvent) {
-        double size = Double.parseDouble(brushSize.getText());
-        double currX = mouseEvent.getX() - size / 2;
-        double currY = mouseEvent.getY() - size / 2;
-        redraw(drawnShapeList, graphicsContext);
-        setupBrush(graphicsContext, size, colorPicker.getValue());
-        graphicsContext.strokeOval(startX, startY, Math.abs(currX - startX), Math.abs(currY - startY));
     }
 
     private void redraw(List<MyShape> drawnShapeList, GraphicsContext graphicsContext) {
         graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         for (MyShape myShape : drawnShapeList) {
-            if (myShape.getClass() == StraightLine.class) {
-                StraightLine currStraightLine = (StraightLine)myShape;
-                setupBrush(graphicsContext, currStraightLine.getSize(), currStraightLine.getColor());
-                graphicsContext.strokeLine(currStraightLine.getStartX(), currStraightLine.getStartY(), currStraightLine.getEndX(), currStraightLine.getEndY());
-            } else if (myShape.getClass() == CustomLine.class) {
-                CustomLine customLine = (CustomLine)myShape;
-                List<StraightLine> straightLineList = customLine.getStraightLineList();
-                for (StraightLine currStraightLine: straightLineList) {
-                    setupBrush(graphicsContext, currStraightLine.getSize(), currStraightLine.getColor());
-                    graphicsContext.strokeLine(currStraightLine.getStartX(), currStraightLine.getStartY(), currStraightLine.getEndX(), currStraightLine.getEndY());
-                }
-            } else if (myShape.getClass() == MyRectangle.class) {
-                MyRectangle myRectangle  = (MyRectangle)myShape;
-                setupBrush(graphicsContext, myRectangle.getBrushSize(), myRectangle.getColor());
-                graphicsContext.strokeRect(myRectangle.getX(), myRectangle.getY(), myRectangle.getWidth(), myRectangle.getHeight());
-            } else if (myShape.getClass() == MyOval.class) {
-                MyOval myOval = (MyOval)myShape;
-                setupBrush(graphicsContext, myOval.getBrushSize(), myOval.getColor());
-                graphicsContext.strokeOval(myOval.getX(), myOval.getY(), myOval.getWidth(), myOval.getHeight());
-
-            }
+            setupBrush(graphicsContext, myShape.getBrushSize(), myShape.getColor());
+            myShape.display(graphicsContext);
         }
+        setupBrush(graphicsContext, Double.parseDouble(brushSize.getText()), colorPicker.getValue());
     }
 
     private void setupBrush(GraphicsContext graphicsContext, double size, Paint value) {
