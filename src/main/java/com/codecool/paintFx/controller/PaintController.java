@@ -50,6 +50,8 @@ public class PaintController {
     @FXML
     private CheckBox lineSnapper;
 
+    private final int rangeToSnap = 50;
+
     private CustomLine customLine;
 
     private List<StraightLine> straightLineList;
@@ -88,7 +90,7 @@ public class PaintController {
                 endY = mouseReleaseEvent.getY()- size / 2;
                 if(lineSnapper.isSelected()) {
                     LinePositionController linePositionController = new LinePositionController();
-                    Position position = linePositionController.PositionSnapper(endX, endY, drawnShapeList, 30);
+                    Position position = linePositionController.PositionSnapper(endX, endY, drawnShapeList, rangeToSnap);
                     endX = position.x;
                     endY = position.y;
                 }
@@ -134,8 +136,8 @@ public class PaintController {
         double currY = mouseEvent.getY() - size / 2;
         if(lineSnapper.isSelected()) {
             LinePositionController linePositionController = new LinePositionController();
-            Position startPosition  = linePositionController.PositionSnapper(startX, startY, drawnShapeList, 30);
-            Position endPosition = linePositionController.PositionSnapper(currX, currY, drawnShapeList, 30);
+            Position startPosition  = linePositionController.PositionSnapper(startX, startY, drawnShapeList, rangeToSnap);
+            Position endPosition = linePositionController.PositionSnapper(currX, currY, drawnShapeList, rangeToSnap);
             startX = startPosition.x;
             startY = startPosition.y;
             currX = endPosition.x;
