@@ -2,9 +2,7 @@ package com.codecool.paintFx.controller;
 
 import com.codecool.paintFx.model.MyShape;
 import com.codecool.paintFx.model.StraightLine;
-import com.codecool.simplePaint.model.Line;
 import com.codecool.paintFx.model.Position;
-
 import java.util.List;
 
 public class LinePositionController {
