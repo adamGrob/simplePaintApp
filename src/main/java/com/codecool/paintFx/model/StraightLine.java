@@ -1,8 +1,5 @@
 package com.codecool.paintFx.model;
-
-import com.codecool.simplePaint.model.Position;
 import javafx.scene.paint.Paint;
-
 
 public class StraightLine extends MyShape {
 
