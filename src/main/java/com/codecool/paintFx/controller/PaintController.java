@@ -58,7 +58,6 @@ public class PaintController {
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
 
         canvas.setOnMouseDragged(mouseEvent -> {
-
             if (straightLineChecked.isSelected()) {
                 drawStraightLines(graphicsContext, mouseEvent);
             } else {
@@ -87,15 +86,13 @@ public class PaintController {
             if (straightLineChecked.isSelected()) {
                 endX = mouseReleaseEvent.getX()- size / 2;
                 endY = mouseReleaseEvent.getY()- size / 2;
-                graphicsContext.setStroke(colorPicker.getValue());
-                graphicsContext.setLineWidth(size);
-                graphicsContext.setLineCap(StrokeLineCap.ROUND);
                 if(lineSnapper.isSelected()) {
                     LinePositionController linePositionController = new LinePositionController();
                     Position position = linePositionController.PositionSnapper(endX, endY, drawnShapeList, 30);
                     endX = position.x;
                     endY = position.y;
                 }
+                setupBrush(graphicsContext, size, colorPicker.getValue());
                 graphicsContext.strokeLine(startX, startY, endX, endY);
                 drawnShapeList.add(new StraightLine(startX, startY, endX, endY,colorPicker.getValue(), size));
             } else {
@@ -124,11 +121,9 @@ public class PaintController {
         double currX = mouseEvent.getX() - size / 2;
         double currY = mouseEvent.getY() - size / 2;
         Paint color = colorPicker.getValue();
-        graphicsContext.setStroke(color);
-        graphicsContext.setLineWidth(size);
-        graphicsContext.setLineCap(StrokeLineCap.ROUND);
+        setupBrush(graphicsContext, size,  colorPicker.getValue());
         graphicsContext.strokeLine(prevX, prevY, currX, currY);
-        straightLineList.add(new StraightLine(prevX, prevY, currX, currY,color, size));
+        straightLineList.add(new StraightLine(prevX, prevY, currX, currY, color, size));
         prevX = currX;
         prevY = currY;
     }
@@ -147,10 +142,12 @@ public class PaintController {
             currY = endPosition.y;
         }
         redraw(drawnShapeList, graphicsContext);
-        graphicsContext.setStroke(colorPicker.getValue());
-        graphicsContext.setLineWidth(size);
-        graphicsContext.setLineCap(StrokeLineCap.ROUND);
+        setupBrush(graphicsContext, size, colorPicker.getValue());
         graphicsContext.strokeLine(startX, startY, currX, currY);
+
+        //Todo shapes
+        //graphicsContext.strokeOval(startX, startY, Math.abs(currX - startX), Math.abs(currY - startY));
+
 
     }
 
@@ -159,19 +156,23 @@ public class PaintController {
         for (MyShape myShape : drawnShapeList) {
             if (myShape.getClass() == StraightLine.class) {
                 StraightLine currStraightLine = (StraightLine)myShape;
-                graphicsContext.setStroke(currStraightLine.getColor());
-                graphicsContext.setLineWidth(currStraightLine.getSize());
+                setupBrush(graphicsContext, currStraightLine.getSize(), currStraightLine.getColor());
                 graphicsContext.strokeLine(currStraightLine.getStartX(), currStraightLine.getStartY(), currStraightLine.getEndX(), currStraightLine.getEndY());
             } else if (myShape.getClass() == CustomLine.class) {
                 CustomLine customLine = (CustomLine)myShape;
                 List<StraightLine> straightLineList = customLine.getStraightLineList();
                 for (StraightLine currStraightLine: straightLineList) {
-                    graphicsContext.setStroke(currStraightLine.getColor());
-                    graphicsContext.setLineWidth(currStraightLine.getSize());
+                    setupBrush(graphicsContext, currStraightLine.getSize(), currStraightLine.getColor());
                     graphicsContext.strokeLine(currStraightLine.getStartX(), currStraightLine.getStartY(), currStraightLine.getEndX(), currStraightLine.getEndY());
                 }
             }
 
         }
+    }
+
+    private void setupBrush(GraphicsContext graphicsContext, double size, Paint value) {
+        graphicsContext.setStroke(value);
+        graphicsContext.setLineWidth(size);
+        graphicsContext.setLineCap(StrokeLineCap.ROUND);
     }
 }
