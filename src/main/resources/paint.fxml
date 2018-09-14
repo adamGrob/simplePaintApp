@@ -8,6 +8,7 @@
 
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.paint.Color?>
+<?import com.sun.javafx.scene.control.skin.TabPaneSkin.TabControlButtons?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.codecool.paintFx.controller.PaintController"
@@ -33,19 +34,30 @@
                         <CheckBox fx:id="lineSnapper">
                             Snap
                         </CheckBox>
-                        <CheckBox fx:id="straightLineChecked" >
-                            Straight Line
-                        </CheckBox>
                         <Button fx:id="undo" >
                             Undo
                         </Button>
                     </HBox>
             </ToolBar>
+            <ToolBar>
+
+                <HBox alignment="CENTER" spacing="5">
+                    <ToggleButton fx:id="straightLineChecked" >
+                        Straight Line
+                    </ToggleButton>
+                    <ToggleButton fx:id="square">
+                        Square
+                    </ToggleButton>
+                    <ToggleButton fx:id="circle">
+                        Circle
+                    </ToggleButton>
+                </HBox>
+            </ToolBar>
         </VBox>
     </top>
 
     <center>
-        <Canvas fx:id="canvas" width="600" height="600"/>
+        <Canvas fx:id="canvas" width="800" height="600"/>
     </center>
 
 </BorderPane>
