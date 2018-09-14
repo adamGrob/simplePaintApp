@@ -8,7 +8,6 @@
 
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.paint.Color?>
-<?import com.sun.javafx.scene.control.skin.TabPaneSkin.TabControlButtons?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.codecool.paintFx.controller.PaintController"
@@ -25,7 +24,7 @@
 
             <ToolBar>
                     <HBox alignment="CENTER" spacing="5">
-                        <TextField fx:id="brushSize" text="18" />
+                        <TextField fx:id="brushSize" text="11" />
                         <ColorPicker fx:id="colorPicker">
                             <value>
                                 <Color blue="0.0" green="0.0" red="0.0" />
