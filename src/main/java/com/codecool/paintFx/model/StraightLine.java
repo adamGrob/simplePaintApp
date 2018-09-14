@@ -1,36 +1,18 @@
 package com.codecool.paintFx.model;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Paint;
 
 public class StraightLine extends MyShape {
 
-    private double startX, startY;
     private double endX, endY;
-    private Paint color;
-    private double size;
 
-    public StraightLine(double startX, double startY, double endX, double endY, Paint color, double size) {
+    public StraightLine(double startX, double startY, double endX, double endY, Paint color, double brushSize) {
         this.startX = startX;
         this.startY = startY;
         this.endX = endX;
         this.endY = endY;
         this.color = color;
-        this.size = size;
-    }
-
-    public double getStartX() {
-        return startX;
-    }
-
-    public void setStartX(double startX) {
-        this.startX = startX;
-    }
-
-    public double getStartY() {
-        return startY;
-    }
-
-    public void setStartY(double startY) {
-        this.startY = startY;
+        this.brushSize = brushSize;
     }
 
     public double getEndX() {
@@ -49,19 +31,8 @@ public class StraightLine extends MyShape {
         this.endY = endY;
     }
 
-    public Paint getColor() {
-        return color;
-    }
-
-    public void setColor(Paint color) {
-        this.color = color;
-    }
-
-    public double getSize() {
-        return size;
-    }
-
-    public void setSize(double size) {
-        this.size = size;
+    @Override
+    public void display(GraphicsContext graphicsContext) {
+        graphicsContext.strokeLine(startX, startY, endX, endY);
     }
 }
