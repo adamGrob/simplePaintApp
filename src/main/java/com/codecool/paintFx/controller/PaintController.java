@@ -58,58 +58,64 @@ public class PaintController {
 
     public void initialize() {
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
-
         canvas.setOnMouseDragged(mouseEvent -> {
-            if (straightLineChecked.isSelected()) {
-                drawShape(graphicsContext, mouseEvent, ShapeEnum.STRAIGHTLINE);
-            } else if (square.isSelected()) {
-                drawShape(graphicsContext, mouseEvent, ShapeEnum.RECTANGLE);
-            } else if (circle.isSelected()) {
-                drawShape(graphicsContext, mouseEvent, ShapeEnum.OVAL);
-            } else {
-                drawShape(graphicsContext, mouseEvent, ShapeEnum.CUSTOMLINE);
-            }
+            drawCurrentShape(graphicsContext, mouseEvent);
         });
-
-        canvas.setOnMousePressed(e-> {
-            double size = Double.parseDouble(brushSize.getText());
-            straightLineList = new ArrayList<>();
-            prevX = e.getX() - size / 2;
-            prevY = e.getY() - size / 2;
-            startX = e.getX() - size / 2;
-            startY = e.getY() - size / 2;
-        });
-
+        canvas.setOnMousePressed(this::updatePositions);
         undo.setOnAction(e->{
             if(drawnShapeList.size() != 0) {
                 drawnShapeList.remove(drawnShapeList.get(drawnShapeList.size()-1));
                 redraw(drawnShapeList, graphicsContext);
             }
         });
-
         canvas.setOnMouseReleased(mouseReleaseEvent -> {
-            double size = Double.parseDouble(brushSize.getText());
-            endX = mouseReleaseEvent.getX()- size / 2;
-            endY = mouseReleaseEvent.getY()- size / 2;
-            if (straightLineChecked.isSelected()) {
-                if(lineSnapper.isSelected()) {
-                    LinePositionController linePositionController = new LinePositionController();
-                    Position position = linePositionController.PositionSnapper(endX, endY, drawnShapeList, rangeToSnap);
-                    endX = position.x;
-                    endY = position.y;
-                }
-                setupBrush(graphicsContext, size, colorPicker.getValue());
-                graphicsContext.strokeLine(startX, startY, endX, endY);
-                drawnShapeList.add(new StraightLine(startX, startY, endX, endY,colorPicker.getValue(), size));
-            } else if (square.isSelected()) {
-                drawnShapeList.add(new MyRectangle(startX, startY, Math.abs(endX - startX), Math.abs(endY - startY), colorPicker.getValue(), size));
-            } else if (circle.isSelected()) {
-              drawnShapeList.add(new MyOval(startX, startY, Math.abs(endX - startX), Math.abs(endY - startY), colorPicker.getValue(), size));
-            } else {
-                customLine = new CustomLine(straightLineList);
-                drawnShapeList.add(customLine);
-            }
+            saveShape(graphicsContext, mouseReleaseEvent);
         });
+    }
+
+    private void drawCurrentShape(GraphicsContext graphicsContext, MouseEvent mouseEvent) {
+        if (straightLineChecked.isSelected()) {
+            drawShape(graphicsContext, mouseEvent, ShapeEnum.STRAIGHTLINE);
+        } else if (square.isSelected()) {
+            drawShape(graphicsContext, mouseEvent, ShapeEnum.RECTANGLE);
+        } else if (circle.isSelected()) {
+            drawShape(graphicsContext, mouseEvent, ShapeEnum.OVAL);
+        } else {
+            drawShape(graphicsContext, mouseEvent, ShapeEnum.CUSTOMLINE);
+        }
+    }
+
+    private void updatePositions(MouseEvent e) {
+        double size = Double.parseDouble(brushSize.getText());
+        straightLineList = new ArrayList<>();
+        prevX = e.getX() - size / 2;
+        prevY = e.getY() - size / 2;
+        startX = e.getX() - size / 2;
+        startY = e.getY() - size / 2;
+    }
+
+    private void saveShape(GraphicsContext graphicsContext, MouseEvent mouseReleaseEvent) {
+        double size = Double.parseDouble(brushSize.getText());
+        endX = mouseReleaseEvent.getX()- size / 2;
+        endY = mouseReleaseEvent.getY()- size / 2;
+        if (straightLineChecked.isSelected()) {
+            if(lineSnapper.isSelected()) {
+                LinePositionController linePositionController = new LinePositionController();
+                Position position = linePositionController.PositionSnapper(endX, endY, drawnShapeList, rangeToSnap);
+                endX = position.x;
+                endY = position.y;
+            }
+            setupBrush(graphicsContext, size, colorPicker.getValue());
+            graphicsContext.strokeLine(startX, startY, endX, endY);
+            drawnShapeList.add(new StraightLine(startX, startY, endX, endY,colorPicker.getValue(), size));
+        } else if (square.isSelected()) {
+            drawnShapeList.add(new MyRectangle(startX, startY, Math.abs(endX - startX), Math.abs(endY - startY), colorPicker.getValue(), size));
+        } else if (circle.isSelected()) {
+          drawnShapeList.add(new MyOval(startX, startY, Math.abs(endX - startX), Math.abs(endY - startY), colorPicker.getValue(), size));
+        } else {
+            customLine = new CustomLine(straightLineList);
+            drawnShapeList.add(customLine);
+        }
     }
 
     public void onSave() {
