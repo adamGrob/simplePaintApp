@@ -2,8 +2,6 @@ package com.codecool.paintFx.controller;
 import com.codecool.paintFx.model.*;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -53,8 +51,6 @@ public class PaintController {
 
     @FXML
     ToggleButton circle;
-
-
 
     public void initialize() {
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
