@@ -35,13 +35,14 @@
                                 <Color blue="0.0" green="0.0" red="0.0" />
                             </value>
                         </ColorPicker>
-                        <CheckBox fx:id="lineSnapper">
+                        <CheckBox fx:id="lineSnapper" disable="true">
                             Snap
                         </CheckBox>
-                        <Button fx:id="undo">
+                    </HBox>
+            <Button mnemonicParsing="false" text="Redo" />
+                     <Button fx:id="undo">
                             Undo
                         </Button>
-                    </HBox>
             </ToolBar>
             <ToolBar>
 
