@@ -20,8 +20,6 @@ public class PaintController {
 
     private double prevX, prevY;
 
-    private double endX, endY;
-
     private double startX, startY;
 
     private List<MyShape> drawnShapeList = new ArrayList<>();
@@ -51,8 +49,6 @@ public class PaintController {
     ToggleButton circle;
 
     private final int rangeToSnap = 50;
-
-    private CustomLine customLine;
 
     private List<StraightLine> straightLineList;
 
@@ -96,8 +92,8 @@ public class PaintController {
 
     private void saveShape(GraphicsContext graphicsContext, MouseEvent mouseReleaseEvent) {
         double size = Double.parseDouble(brushSize.getText());
-        endX = mouseReleaseEvent.getX()- size / 2;
-        endY = mouseReleaseEvent.getY()- size / 2;
+        double endX = mouseReleaseEvent.getX() - size / 2;
+        double endY = mouseReleaseEvent.getY() - size / 2;
         if (straightLineChecked.isSelected()) {
             if(lineSnapper.isSelected()) {
                 LinePositionController linePositionController = new LinePositionController();
@@ -113,7 +109,7 @@ public class PaintController {
         } else if (circle.isSelected()) {
           drawnShapeList.add(new MyOval(startX, startY, Math.abs(endX - startX), Math.abs(endY - startY), colorPicker.getValue(), size));
         } else {
-            customLine = new CustomLine(straightLineList);
+            CustomLine customLine = new CustomLine(straightLineList);
             drawnShapeList.add(customLine);
         }
     }
