@@ -39,10 +39,10 @@
                             Snap
                         </CheckBox>
                     </HBox>
-            <Button mnemonicParsing="false" text="Redo" />
                      <Button fx:id="undo">
                             Undo
                         </Button>
+            <Button fx:id="redo" mnemonicParsing="false" text="Redo" />
             </ToolBar>
             <ToolBar>
 
