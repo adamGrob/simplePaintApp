@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 public class PaintController {
 
@@ -27,6 +28,8 @@ public class PaintController {
     private final int rangeToSnap = 50;
 
     private List<StraightLine> straightLineList;
+
+    private Stack<MyShape> redoStack = new Stack<>();
 
     @FXML
     private Canvas canvas;
@@ -42,6 +45,9 @@ public class PaintController {
 
     @FXML
     private Button undo;
+
+    @FXML
+    private Button redo;
 
     @FXML
     private CheckBox lineSnapper;
@@ -60,14 +66,22 @@ public class PaintController {
         canvas.setOnMousePressed(this::updatePositions);
         undo.setOnAction(e->{
             if(drawnShapeList.size() != 0) {
-                drawnShapeList.remove(drawnShapeList.get(drawnShapeList.size()-1));
+                MyShape shapeToRemove = drawnShapeList.get(drawnShapeList.size()-1);
+                redoStack.push(shapeToRemove);
+                drawnShapeList.remove(shapeToRemove);
+                redraw(drawnShapeList, graphicsContext);
+            }
+        });
+        redo.setOnAction(event -> {
+            if(redoStack.size() != 0) {
+                MyShape shapeToRedo = redoStack.pop();
+                drawnShapeList.add(shapeToRedo);
                 redraw(drawnShapeList, graphicsContext);
             }
         });
         canvas.setOnMouseReleased(mouseReleaseEvent -> {
             saveShape(graphicsContext, mouseReleaseEvent);
         });
-
         handleSnapCheckBoxDisable();
     }
 
@@ -75,11 +89,9 @@ public class PaintController {
         straightLineChecked.setOnAction( event -> {
             lineSnapper.setDisable(false);
         });
-
         square.setOnAction( event -> {
             lineSnapper.setDisable(true);
         });
-
         circle.setOnAction( event -> {
             lineSnapper.setDisable(true);
         });
