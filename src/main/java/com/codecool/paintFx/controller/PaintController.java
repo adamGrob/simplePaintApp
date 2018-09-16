@@ -2,6 +2,8 @@ package com.codecool.paintFx.controller;
 import com.codecool.paintFx.model.*;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -23,6 +25,10 @@ public class PaintController {
     private double startX, startY;
 
     private List<MyShape> drawnShapeList = new ArrayList<>();
+
+    private final int rangeToSnap = 50;
+
+    private List<StraightLine> straightLineList;
 
     @FXML
     private Canvas canvas;
@@ -48,9 +54,7 @@ public class PaintController {
     @FXML
     ToggleButton circle;
 
-    private final int rangeToSnap = 50;
 
-    private List<StraightLine> straightLineList;
 
     public void initialize() {
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
@@ -66,6 +70,22 @@ public class PaintController {
         });
         canvas.setOnMouseReleased(mouseReleaseEvent -> {
             saveShape(graphicsContext, mouseReleaseEvent);
+        });
+
+        handleSnapCheckBoxDisable();
+    }
+
+    private void handleSnapCheckBoxDisable() {
+        straightLineChecked.setOnAction( event -> {
+            lineSnapper.setDisable(false);
+        });
+
+        square.setOnAction( event -> {
+            lineSnapper.setDisable(true);
+        });
+
+        circle.setOnAction( event -> {
+            lineSnapper.setDisable(true);
         });
     }
 
